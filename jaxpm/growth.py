@@ -3,7 +3,6 @@ from jax_cosmo.background import *
 from jax_cosmo.scipy.interpolate import interp
 from jax_cosmo.scipy.ode import odeint
 
-
 def E(cosmo, a):
     r"""Scale factor dependent factor E(a) in the Hubble
     parameter.
@@ -28,7 +27,6 @@ def E(cosmo, a):
     """
     return np.power(Esqr(cosmo, a), 0.5)
 
-
 def df_de(cosmo, a, epsilon=1e-5):
     r"""Derivative of the evolution parameter for the Dark Energy density
     f(a) with respect to the scale factor.
@@ -52,9 +50,9 @@ def df_de(cosmo, a, epsilon=1e-5):
     \frac{df}{da}(a) = =\frac{3w_a \left( \ln(a-\epsilon)-
     \frac{a-1}{a-\epsilon}\right)}{\ln^2(a-\epsilon)}
     """
-    return (3 * cosmo.wa * (np.log(a - epsilon) - (a - 1) / (a - epsilon)) /
-            np.power(np.log(a - epsilon), 2))
-
+    #return (3 * cosmo.wa * (np.log(a - epsilon) - (a - 1) / (a - epsilon)) /
+            #np.power(np.log(a - epsilon), 2))
+    return -((4.0** np.power(a, -5))/(1.0+(a/cosmo.a_st)**(cosmo.eme)))*((1.0+(a/cosmo.a_st)**(cosmo.eme))/(1.0+(1/cosmo.a_st)**(cosmo.eme)))**(4.0/cosmo.eme)
 
 def dEa(cosmo, a):
     r"""Derivative of the scale factor dependent factor E(a) in the Hubble
@@ -91,7 +89,6 @@ def dEa(cosmo, a):
              df_de(cosmo, a) * cosmo.Omega_de * np.power(a, f_de(cosmo, a))) /
             np.power(Esqr(cosmo, a), 0.5))
 
-
 def growth_factor(cosmo, a):
     """Compute linear growth factor D(a) at a given scale factor,
     normalized such that D(a=1) = 1.
@@ -120,7 +117,6 @@ def growth_factor(cosmo, a):
         return _growth_factor_gamma(cosmo, a)
     else:
         return _growth_factor_ODE(cosmo, a)
-
 
 def growth_factor_second(cosmo, a):
     """Compute second order growth factor D2(a) at a given scale factor,
@@ -151,7 +147,6 @@ def growth_factor_second(cosmo, a):
         return None
     else:
         return _growth_factor_second_ODE(cosmo, a)
-
 
 def growth_rate(cosmo, a):
     """Compute growth rate dD/dlna at a given scale factor.
@@ -194,7 +189,6 @@ def growth_rate(cosmo, a):
     else:
         return _growth_rate_ODE(cosmo, a)
 
-
 def growth_rate_second(cosmo, a):
     """Compute second order growth rate dD2/dlna at a given scale factor.
 
@@ -223,7 +217,6 @@ def growth_rate_second(cosmo, a):
         return None
     else:
         return _growth_rate_second_ODE(cosmo, a)
-
 
 def _growth_factor_ODE(cosmo, a, log10_amin=-3, steps=128, eps=1e-4):
     """Compute linear growth factor D(a) at a given scale factor,
@@ -295,7 +288,6 @@ def _growth_factor_ODE(cosmo, a, log10_amin=-3, steps=128, eps=1e-4):
         cache = cosmo._workspace["background.growth_factor"]
     return np.clip(interp(a, cache["a"], cache["g"]), 0.0, 1.0)
 
-
 def _growth_rate_ODE(cosmo, a):
     """Compute growth rate dD/dlna at a given scale factor by solving the linear
     growth ODE.
@@ -318,7 +310,6 @@ def _growth_rate_ODE(cosmo, a):
         _growth_factor_ODE(cosmo, np.atleast_1d(1.0))
     cache = cosmo._workspace["background.growth_factor"]
     return interp(a, cache["a"], cache["f"])
-
 
 def _growth_factor_second_ODE(cosmo, a):
     """Compute second order growth factor D2(a) at a given scale factor,
@@ -343,7 +334,6 @@ def _growth_factor_second_ODE(cosmo, a):
     cache = cosmo._workspace["background.growth_factor"]
     return interp(a, cache["a"], cache["g2"])
 
-
 def _growth_rate_ODE(cosmo, a):
     """Compute growth rate dD/dlna at a given scale factor by solving the linear
     growth ODE.
@@ -367,7 +357,6 @@ def _growth_rate_ODE(cosmo, a):
     cache = cosmo._workspace["background.growth_factor"]
     return interp(a, cache["a"], cache["f"])
 
-
 def _growth_rate_second_ODE(cosmo, a):
     """Compute second order growth rate dD2/dlna at a given scale factor by solving the linear
     growth ODE.
@@ -390,7 +379,6 @@ def _growth_rate_second_ODE(cosmo, a):
         _growth_factor_ODE(cosmo, np.atleast_1d(1.0))
     cache = cosmo._workspace["background.growth_factor"]
     return interp(a, cache["a"], cache["f2"])
-
 
 def _growth_factor_gamma(cosmo, a, log10_amin=-3, steps=128):
     r"""Computes growth factor by integrating the growth rate provided by the
@@ -427,7 +415,6 @@ def _growth_factor_gamma(cosmo, a, log10_amin=-3, steps=128):
         cache = cosmo._workspace["background.growth_factor"]
     return np.clip(interp(a, cache["a"], cache["g"]), 0.0, 1.0)
 
-
 def _growth_rate_gamma(cosmo, a):
     r"""Growth rate approximation at scale factor `a`.
 
@@ -461,7 +448,6 @@ def _growth_rate_gamma(cosmo, a):
     """
     return Omega_m_a(cosmo, a)**cosmo.gamma
 
-
 def Gf(cosmo, a):
     r"""
     FastPM growth factor function
@@ -491,7 +477,6 @@ def Gf(cosmo, a):
     D1f = f1 * g1 / a
     return D1f * np.power(a, 3) * np.power(Esqr(cosmo, a), 0.5)
 
-
 def Gf2(cosmo, a):
     r""" FastPM second order growth factor function
 
@@ -519,7 +504,6 @@ def Gf2(cosmo, a):
     g2 = growth_factor_second(cosmo, a)
     D2f = f2 * g2 / a
     return D2f * np.power(a, 3) * np.power(Esqr(cosmo, a), 0.5)
-
 
 def dGfa(cosmo, a):
     r""" Derivative of Gf against a
@@ -554,7 +538,6 @@ def dGfa(cosmo, a):
     f1p = interp(np.log(a), np.log(cache['a']), f1p)
     Ea = E(cosmo, a)
     return (f1p * a**3 * Ea + D1f * a**3 * dEa(cosmo, a) + 3 * a**2 * Ea * D1f)
-
 
 def dGf2a(cosmo, a):
     r""" Derivative of Gf2 against a
